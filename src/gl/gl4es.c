@@ -879,7 +879,11 @@ void APIENTRY_GL4ES gl4es_glCallList(GLuint list) {
         draw_renderlist(l);
 }
 AliasExport(void,glCallList,,(GLuint list));
-
+#ifdef __APPLE__
+void glCallList(GLuint list) {
+    gl4es_glCallList(list);
+}
+#endif
 void APIENTRY_GL4ES glPushCall(void *call) {
     if (glstate->list.active) {
 		NewStage(glstate->list.active, STAGE_GLCALL);

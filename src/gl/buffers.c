@@ -121,6 +121,12 @@ void APIENTRY_GL4ES gl4es_glGenBuffers(GLsizei n, GLuint * buffers) {
         buff->real_buffer = 0;
     }
 }
+#ifdef __APPLE__
+void glGenBuffers(GLsizei n, GLuint * buffer) {
+    gl4es_glGenBuffers(n, buffer);
+}
+#endif
+
 
 void APIENTRY_GL4ES gl4es_glBindBuffer(GLenum target, GLuint buffer) {
     DBG(printf("glBindBuffer(%s, %u)\n", PrintEnum(target), buffer);)

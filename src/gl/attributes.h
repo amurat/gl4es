@@ -53,7 +53,21 @@
 #endif
 
 #ifndef AliasDecl
- #ifdef __GNUC__
+
+/* Darwin doesn't support alias attributes.  */
+#ifndef __APPLE__
+# define _strong_alias(name, aliasname) \
+  extern __typeof (name) aliasname __attribute__ ((alias (#name)))
+#else
+# define _strong_alias(name, aliasname) \
+  __asm__(".globl _" #aliasname); \
+  __asm__(".set _" #aliasname ", _" #name); \
+  extern __typeof(name) aliasname
+#endif
+
+ #if defined(__APPLE__)
+  #define AliasDecl(RET,NAME,DEF,OLD)
+ #elif defined(__GNUC__)
   #define AliasDecl(RET,NAME,DEF,OLD) \
    RET APIENTRY_GL4ES NAME DEF __attribute__((alias(_STM(OLD,DEF))))
  #elif defined(_MSC_VER)

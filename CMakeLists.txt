@@ -43,6 +43,11 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows" OR CMAKE_SYSTEM_NAME MATCHES "MSYS")
     endif()
 endif()
 
+if(CMAKE_SYSTEM_NAME MATCHES "Darwin" OR CMAKE_SYSTEM_NAME MATCHES "MSYS")
+    set(NOX11 ON)
+    set(NO_GBM ON)
+ endif()
+
 # Pandora
 if(PANDORA)
     add_definitions(-DPANDORA)

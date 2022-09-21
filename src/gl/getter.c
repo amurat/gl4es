@@ -940,7 +940,11 @@ void APIENTRY_GL4ES gl4es_glGetFloatv(GLenum pname, GLfloat *params) {
     }
 }
 AliasExport(void,glGetFloatv,,(GLenum pname, GLfloat *params));
-
+#ifdef __APPLE__
+void glGetFloatv(GLenum pname, GLfloat *params) {
+    gl4es_glGetFloatv(pname, params);
+}
+#endif
 void APIENTRY_GL4ES gl4es_glGetDoublev(GLenum pname, GLdouble *params) {
     DBG(printf("glGetDoublev(%s, %p)\n", PrintEnum(pname), params);)
     GLfloat tmp[4*4];
