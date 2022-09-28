@@ -215,7 +215,7 @@ void initialize_gl4es() {
 #endif
     }
 
-#if !defined(__EMSCRIPTEN__) && !defined(__APPLE__)
+#if !defined(__EMSCRIPTEN__) 
     load_libs();
 #endif
 

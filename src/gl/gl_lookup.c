@@ -34,7 +34,7 @@ void gl4es_Stub(void *x, ...) {
 void APIENTRY_GL4ES gl4es_Stub(void *x) {}
 #endif
 
-void* APIENTRY_GL4ES gl4es_GetProcAddress(const char *name) {
+void* APIENTRY_GL4ES EXPORT gl4es_GetProcAddress(const char *name) {
     DBG(printf("glGetProcAddress(\"%s\")", name);)
     // generated gles wrappers
     #include "glesfuncs.inc"

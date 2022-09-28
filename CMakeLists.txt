@@ -46,6 +46,7 @@ endif()
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin" OR CMAKE_SYSTEM_NAME MATCHES "MSYS")
     set(NOX11 ON)
     set(NO_GBM ON)
+    set(NOEGL ON)
  endif()
 
 # Pandora
