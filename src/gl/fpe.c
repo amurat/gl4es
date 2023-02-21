@@ -1223,7 +1223,7 @@ void realize_glenv(int ispoint, int first, int count, GLenum type, const void* i
                     tmp[2]+=1.f;
                     vector4_normalize(tmp);
                 }
-                GoUniformfv(glprogram, glprogram->builtin_lights[i].halfVector, 1, 1, tmp);
+                GoUniformfv(glprogram, glprogram->builtin_lights[i].halfVector, 4, 1, tmp);
                }
                GoUniformfv(glprogram, glprogram->builtin_lights[i].spotDirection, 3, 1, glstate->light.lights[i].spotDirection);
                GoUniformfv(glprogram, glprogram->builtin_lights[i].spotExponent, 1, 1, &glstate->light.lights[i].spotExponent);
