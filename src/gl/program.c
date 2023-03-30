@@ -810,6 +810,7 @@ void APIENTRY_GL4ES gl4es_glLinkProgram(GLuint program) {
 
 void APIENTRY_GL4ES gl4es_glUseProgram(GLuint program) {
     DBG(printf("glUseProgram(%d) old=%d\n", program, glstate->glsl->program);)
+
     PUSH_IF_COMPILING(glUseProgram);
     if(program==0) {
         glstate->glsl->program=0;

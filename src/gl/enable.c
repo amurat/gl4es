@@ -267,11 +267,16 @@ static void proxy_glEnable(GLenum cap, bool enable, void (APIENTRY_GLES *next)(G
     #undef clientGO
 }
 
+#define GL_FRAMEBUFFER_SRGB 0x8DB9
 void APIENTRY_GL4ES gl4es_glEnable(GLenum cap) {
     DBG(printf("glEnable(%s), glstate->list.pending=%d\n", PrintEnum(cap), glstate->list.pending);)
     if(!glstate->list.pending) {
 	    PUSH_IF_COMPILING(glEnable)
     }
+    if (GL_FRAMEBUFFER_SRGB == cap) {
+        return;
+    }
+
 #ifdef TEXSTREAM00
 	if (globals4es.texstream && (cap==GL_TEXTURE_2D)) {
         if (glstate->texture.bound[glstate->texture.active][ENABLED_TEX2D]->streamed)
@@ -289,6 +294,9 @@ AliasExport(void,glEnable,,(GLenum cap));
 
 void APIENTRY_GL4ES gl4es_glDisable(GLenum cap) {
     DBG(printf("glDisable(%s), glstate->list.pending=%d\n", PrintEnum(cap), glstate->list.pending);)
+    if (GL_FRAMEBUFFER_SRGB == cap) {
+        return;
+    }
     if(!glstate->list.pending) {
 	    PUSH_IF_COMPILING(glDisable)
     }

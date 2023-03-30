@@ -28,6 +28,10 @@ option(USE_ANDROID_LOG "Set to ON to use Android log instead of stdio" ${USE_AND
 option(EGL_WRAPPER "Set to ON to build EGL wrapper" ${EGL_WRAPPER})
 option(GLX_STUBS "Set to ON to build GLX function stubs" ${GLX_STUBS})
 
+if (USE_DEBUG)
+  add_definitions(-DDEBUG)
+endif()
+
 include(CheckSymbolExists)
 check_symbol_exists(backtrace "execinfo.h" HAS_BACKTRACE)
 if (HAS_BACKTRACE)
