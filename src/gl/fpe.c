@@ -38,7 +38,7 @@ void fpe_Dispose(glstate_t *glstate) {
 
 void APIENTRY_GL4ES fpe_ReleventState_DefaultVertex(fpe_state_t *dest, fpe_state_t *src, shaderconv_need_t* need)
 {
-    // filter out some non relevent state (like texture stuff if texture is disabled)
+    // filter out some non relevant state (like texture stuff if texture is disabled)
     memcpy(dest, src, sizeof(fpe_state_t));
     // alpha test
     if(!dest->alphatest) {
@@ -127,6 +127,14 @@ void APIENTRY_GL4ES fpe_ReleventState_DefaultVertex(fpe_state_t *dest, fpe_state
         dest->pointsprite_upper = 0;
         dest->pointsprite_coord = 0;
     }
+    if(!dest->blend_enable) {
+        dest->blendsrcrgb = 0;
+        dest->blenddstrgb = 0;
+        dest->blendsrcalpha = 0;
+        dest->blenddstalpha = 0;
+        dest->blendeqrgb = 0;
+        dest->blendeqalpha = 0;
+    }
     // ARB_vertex_program and ARB_fragment_program
     dest->vertex_prg_id = 0;    // it's a default vertex program...
     if(!dest->fragment_prg_enable)
@@ -135,7 +143,7 @@ void APIENTRY_GL4ES fpe_ReleventState_DefaultVertex(fpe_state_t *dest, fpe_state
 
 void APIENTRY_GL4ES fpe_ReleventState(fpe_state_t *dest, fpe_state_t *src, int fixed)
 {
-    // filter out some non relevent state (like texture stuff if texture is disabled)
+    // filter out some non relevant state (like texture stuff if texture is disabled)
     memcpy(dest, src, sizeof(fpe_state_t));
     // alpha test
     if(!dest->alphatest) {
@@ -246,6 +254,14 @@ void APIENTRY_GL4ES fpe_ReleventState(fpe_state_t *dest, fpe_state_t *src, int f
 
         dest->vertex_prg_enable = 0;
         dest->fragment_prg_enable = 0;
+    }
+    if(!fixed || !dest->blend_enable) {
+        dest->blendsrcrgb = 0;
+        dest->blenddstrgb = 0;
+        dest->blendsrcalpha = 0;
+        dest->blenddstalpha = 0;
+        dest->blendeqrgb = 0;
+        dest->blendeqalpha = 0;
     }
 }
 
@@ -1478,11 +1494,11 @@ void realize_glenv(int ispoint, int first, int count, GLenum type, const void* i
                         gles_glVertexAttribIPointer(i, v->size, v->type, v->stride, v->pointer);
                     else
                         gles_glVertexAttribPointer(i, v->size, v->type, 0, v->stride, v->pointer);
-                    DBG(printf("glVertexAttribIPointer(%d, %d, %s, %d, %p)\n", i, v->size, PrintEnum(v->type), v->stride, (GLvoid*)((uintptr_t)v->pointer+((v->buffer)?(uintptr_t)v->buffer->data:0)));)
+                    DBG(printf("glVertexAttribIPointer(%d, %d, %s, %d, %p)\n", i, v->size, PrintEnum(v->type), v->stride, v->pointer);)
                 }
                 else {
                     gles_glVertexAttribPointer(i, v->size, v->type, v->normalized, v->stride, v->pointer);
-                    DBG(printf("glVertexAttribPointer(%d, %d, %s, %d, %d, %p)\n", i, v->size, PrintEnum(v->type), v->normalized, v->stride, (GLvoid*)((uintptr_t)v->pointer+((v->buffer)?(uintptr_t)v->buffer->data:0)));)
+                    DBG(printf("glVertexAttribPointer(%d, %d, %s, %d, %d, %p)\n", i, v->size, PrintEnum(v->type), v->normalized, v->stride, v->pointer);)
                 }
             }
         } else {
@@ -1638,6 +1654,7 @@ void builtin_Init(program_t *glprogram) {
     glprogram->builtin_fog.start = -1;
     glprogram->builtin_fog.end = -1;
     glprogram->builtin_fog.scale = -1;
+    glprogram->builtin_blendcolor = -1;
     // fpe uniform
     glprogram->fpe_alpharef = -1;
     // initialise emulated builtin attrib to -1
@@ -1705,6 +1722,7 @@ const char* samplers1d_noa = "_gl4es_Sampler1D_";
 const char* samplers2d_noa = "_gl4es_Sampler2D_";
 const char* samplers3d_noa = "_gl4es_Sampler3D_";
 const char* samplersCube_noa = "_gl4es_SamplerCube_";
+const char* blend_color_code = "_gl4es_BlendColor";
 int builtin_CheckUniform(program_t *glprogram, char* name, GLint id, int size) {
     if(strncmp(name, gl4es_code, strlen(gl4es_code)))
         return 0;   // doesn't start with "_gl4es_", no need to look further
@@ -2006,6 +2024,12 @@ int builtin_CheckUniform(program_t *glprogram, char* name, GLint id, int size) {
             glprogram->has_builtin_texadjust = 1;
             return 1;
         }
+    }
+    // blend color
+    if(strncmp(name, blend_color_code, strlen(blend_color_code))==0) {
+        glprogram->builtin_blendcolor = id;
+        glprogram->has_builtin_blendcolor = 1;
+        return 1;
     }
     // oldprogram
     if(strncmp(name, vtx_progenv_arr, strlen(vtx_progenv_arr))==0) {

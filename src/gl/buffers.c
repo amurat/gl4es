@@ -88,8 +88,8 @@ void rebind_real_buff_arrays(int old_buffer, int new_buffer) {
     for (int j = 0; j < hardext.maxvattrib; j++) {
         if (glstate->vao->vertexattrib[j].real_buffer == old_buffer) {
             glstate->vao->vertexattrib[j].real_buffer = new_buffer;
-            if(!new_buffer)
-                glstate->vao->vertexattrib[j].real_pointer = 0;
+            /*if(!new_buffer)
+                glstate->vao->vertexattrib[j].real_pointer = 0;*/
         }
     }
 }
@@ -219,6 +219,14 @@ void APIENTRY_GL4ES gl4es_glBufferData(GLenum target, GLsizeiptr size, const GLv
     buff->access = GL_READ_WRITE;
     if (data)
         memcpy(buff->data, data, size);
+    // update binded VA
+    for (int i=0; i<hardext.maxvattrib; ++i) {
+        vertexattrib_t *v = &glstate->vao->vertexattrib[i];
+        if( v->buffer == buff ) {
+		    v->real_buffer = v->buffer->real_buffer;
+            // do not update real_pointer, as it's the relative start in the buffer
+        }
+    }
     noerrorShim();
 }
 
@@ -262,6 +270,14 @@ void APIENTRY_GL4ES gl4es_glNamedBufferData(GLuint buffer, GLsizeiptr size, cons
     buff->access = GL_READ_WRITE;
     if (data)
         memcpy(buff->data, data, size);
+    // update binded VA
+    for (int i=0; i<hardext.maxvattrib; ++i) {
+        vertexattrib_t *v = &glstate->vao->vertexattrib[i];
+        if( v->buffer == buff ) {
+		    v->real_buffer = v->buffer->real_buffer;
+            // do not update real_pointer, as it's the relative start in the buffer
+        }
+    }
     noerrorShim();
 }
 
@@ -350,8 +366,11 @@ void APIENTRY_GL4ES gl4es_glDeleteBuffers(GLsizei n, const GLuint * buffers) {
                     if (glstate->vao->unpack == buff)
                         glstate->vao->unpack = NULL;
                     for (int j = 0; j < hardext.maxvattrib; j++)
-                        if (glstate->vao->vertexattrib[j].buffer == buff)
+                        if (glstate->vao->vertexattrib[j].buffer == buff) {
                             glstate->vao->vertexattrib[j].buffer = NULL;
+                            glstate->vao->vertexattrib[j].real_buffer = 0;
+                            glstate->vao->vertexattrib[j].real_pointer = 0;
+                        }
                     DBG(printf("\t buff->data = %p\n", buff->data);)
                     if (buff->data) free(buff->data);
                     kh_del(buff, list, k);
