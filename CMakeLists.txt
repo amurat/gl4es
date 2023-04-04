@@ -53,6 +53,13 @@ if(CMAKE_SYSTEM_NAME MATCHES "Darwin" OR CMAKE_SYSTEM_NAME MATCHES "MSYS")
     set(NOEGL ON)
  endif()
 
+ if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+    set(NOX11 ON)
+    set(NO_GBM ON)
+    set(NOEGL ON)
+    set(NO_INIT_CONSTRUCTOR ON)
+endif()
+
 # Pandora
 if(PANDORA)
     add_definitions(-DPANDORA)
